@@ -1,0 +1,8 @@
+---
+
+keep_role: "master"
+keep_priority: 100
+keep_backup_priority: 50
+keep_interface: "ens32"
+virtual_ipaddress: "192.168.26.200"
+check_service_name: httpd

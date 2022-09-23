@@ -1,0 +1,12 @@
+---
+- hosts: 192.168.26.153
+  vars:
+    keep_role: MASTER
+  roles:
+    - keepalived
+
+- hosts: 192.168.26.154
+  vars:
+    keep_role: BACKUP
+  roles:
+    - keepalived

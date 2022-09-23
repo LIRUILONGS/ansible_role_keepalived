@@ -1,0 +1,34 @@
+! Configuration File for keepalived
+
+global_defs {
+   router_id LVS_DEVEL #设置路由ID,可以和主机名相同，也可以随便定义
+   vrrp_iptables       #手动添加(禁止设置防火墙规则，keepalved每次启动都会自动添加防火墙拒绝所有的规则)
+}
+
+vrrp_script chk_service {
+    script /etc/keepalived/che_service.sh
+    interval 2
+}
+
+vrrp_instance VI_1 {
+    state {{ keep_role }}
+    interface {{ keep_interface }} #定义网络接口，根据自己虚拟机上的网卡修改
+    virtual_router_id 51  #主备服务器VRID号必须保持一致
+    {% if keep_role.lower() == 'master' %}
+    priority {{ keep_priority }} 
+    {% else %}
+    priority {{ keep_backup_priority }}
+    {% endif %} 
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        {{ virtual_ipaddress }} dev {{ keep_interface }}
+    }
+    
+    track_script {
+        chk_service
+    }
+}

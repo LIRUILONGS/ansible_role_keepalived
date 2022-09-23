@@ -1,0 +1,35 @@
+---
+# tasks file for keepalived
+
+# 安装 keepalived
+- name: Install keepalived
+  yum: 
+    name: keepalived
+    state: latest
+  tags: keepalived
+  notify: restart keepalived
+
+# copy 配置文件
+- name: Keepalived configuration
+  template: 
+    src: keepalived.conf.j2 
+    dest: /etc/keepalived/keepalived.conf
+  notify: restart keepalived
+# copy 检查脚本
+- when:  check_service_name | default(False) 
+  name: Install check script
+  copy:
+    content: "#!/bin/sh\nsystemctl is-active  {{ check_service_name }}  -q"
+    dest: /etc/keepalived/che_service.sh
+    backup: yes
+    mode: 0755
+    owner: root
+    group: root
+  notify: restart keepalived
+
+# 启动 服务
+- name: Start keepalived
+  service: 
+    name: keepalived
+    state: started
+    enabled: yes
